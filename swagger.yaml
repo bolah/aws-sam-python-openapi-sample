@@ -1,0 +1,48 @@
+openapi: "3.0.1"
+info:
+  title: "hello-world-api"
+  version: "v1.0"
+paths:
+  /{name}:
+    get:
+      summary: Hello Your Name API
+      description: Guess what it returns
+      parameters:
+        - name: "name"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HelloWorldResponse"
+        404:
+          description: "404 response"
+          content: {}
+        500:
+          description: "500 response"
+          content: {}
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HelloWorldFunction.Arn}/invocations
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+
+components:
+  schemas:
+    HelloWorldResponse:
+      type: object
+      properties:
+        time:
+          type: string
+        message:
+          type: string
